@@ -4,6 +4,11 @@
 A customer-facing bank transaction chatbot built with **Google ADK** and **OpenAI GPT-4o-mini** (OpenAI-compatible provider).  
 Designed as PoC demonstrating: agentic tool use, safety guardrails, and evaluation tests.
 
+
+> **OpenAI-compatible provider used:** `openai/gpt-4o-mini` via ADK's LiteLLM layer — drop in your own `OPENAI_API_KEY` and run in 3 commands.
+ADK uses LiteLLM under the hood which supports OpenAI and 100+ other providers. The openai/ prefix in the model string tells LiteLLM to route to OpenAI.
+
+
 ---
 
 ## Quickstart
