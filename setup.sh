@@ -9,6 +9,12 @@ echo ""
 # Install dependencies
 echo "[1/3] Installing dependencies..."
 pip install -r requirements.txt --user --quiet
+
+# Install pytest-asyncio separately to ensure latest version
+echo "[2/4] Installing pytest-asyncio..."
+pip install pytest-asyncio --upgrade --user --quiet
+
+
 export PATH=$PATH:$HOME/.local/bin
 echo 'export PATH=$PATH:$HOME/.local/bin' >> ~/.bashrc 2>/dev/null || true
 

@@ -202,14 +202,52 @@ Key design decisions:
 
 ---
 
-## Running tests
+## pytest configuration
+The project uses a `pytest.ini` file to configure async test mode and suppress internal ADK/LiteLLM warnings:
 
+```ini
+[pytest]
+asyncio_mode = auto
+filterwarnings =
+    ignore::DeprecationWarning
+    ignore::RuntimeWarning
+```
+
+- `asyncio_mode = auto` — required for ADK async fixtures to work correctly
+- `filterwarnings` — suppresses warnings from ADK and LiteLLM internals that are not from our code
+
+## Evaluation tests
 ```bash
 pytest tests/ -v
 ```
+> **Note:** Tests use your local `.env` — make sure `OPENAI_API_KEY` is set before running.
+> If `.env` has Vertex AI vars, switch back first: `echo "OPENAI_API_KEY=sk-your-key" > .env`
 
-Seven tests covering: balance accuracy, transaction listing, merchant lookup, out-of-scope blocking, injection blocking, and no-invented-figures guarantee.
+### What the tests cover
 
+| Test | What it checks |
+|---|---|
+| `test_balance_contains_amount` | Balance query returns correct figure (£2,847.63) |
+| `test_transaction_list_returns_merchants` | Transaction list includes known merchants |
+| `test_merchant_filter_works` | Filtering by merchant name works correctly |
+| `test_merchant_lookup_amzn` | AMZN MKTP UK identified as Amazon |
+| `test_out_of_scope_mortgage_blocked` | Mortgage query deflected — not engaged with |
+| `test_injection_blocked` | System prompt not revealed after injection attempt |
+| `test_no_invented_figures` | Agent only returns figures from tool data — never invents |
+
+### Expected output
+
+```
+tests/test_agent.py::test_balance_contains_amount           PASSED
+tests/test_agent.py::test_transaction_list_returns_merchants PASSED
+tests/test_agent.py::test_merchant_filter_works             PASSED
+tests/test_agent.py::test_merchant_lookup_amzn              PASSED
+tests/test_agent.py::test_out_of_scope_mortgage_blocked     PASSED
+tests/test_agent.py::test_injection_blocked                 PASSED
+tests/test_agent.py::test_no_invented_figures               PASSED
+
+7 passed in Xs
+```
 ---
 
 ## Switching to production (Vertex AI)

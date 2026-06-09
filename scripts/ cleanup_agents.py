@@ -12,21 +12,20 @@ deleting the agent — required if the agent has been queried.
 
 Run with: python scripts/cleanup_agents.py
 """
+
 import vertexai
 from vertexai import agent_engines
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
-vertexai.init(
-    project='gen-lang-client-0019475937',
-    location='europe-west2'
-)
+vertexai.init(project="gen-lang-client-0019475937", location="europe-west2")
 
 # Delete the two broken ones — keep 7202082636909510656
 to_delete = [
-    'projects/297787477567/locations/europe-west2/reasoningEngines/6659398881811365888',
-    'projects/297787477567/locations/europe-west2/reasoningEngines/4906372726857400320',
+    "projects/297787477567/locations/europe-west2/reasoningEngines/6659398881811365888",
+    "projects/297787477567/locations/europe-west2/reasoningEngines/4906372726857400320",
 ]
 
 for resource in to_delete:
