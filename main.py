@@ -128,10 +128,11 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    if not os.getenv("GOOGLE_API_KEY") and not os.getenv("GOOGLE_GENAI_USE_VERTEXAI"):
+    if not os.getenv("OPENAI_API_KEY") and not os.getenv("OPENAI_API_KEY"):
         console.print(
-            "[bold red]Error:[/bold red] GOOGLE_API_KEY not set.\n"
-            "Copy .env.example to .env and add your key from aistudio.google.com"
+            "[bold red]Error:[/bold red] OPENAI_API_KEY not set.\n"
+            "Copy .env.example to .env and add your key from platform.openai.com/api-keys"
         )
+
         raise SystemExit(1)
     asyncio.run(main())
