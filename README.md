@@ -63,10 +63,15 @@ bank-chatbot/
 │   ├── agent.py          # Agent definition: model, tools, guardrail callbacks
 │   ├── tools.py          # get_balance, get_transactions, lookup_merchant
 │   ├── guardrails.py     # input_guardrail + output_guardrail (ADK callbacks)
-│   └── data.py           # Synthetic transaction data (should be replaced by core banking API)
+│   └── data.py           # Synthetic transaction data (replaces core banking API)
 ├── tests/
-│   └── test_agent.py     # evaluation tests
+│   └── test_agent.py     # Evaluation tests — golden questions
+├── scripts/
+│   ├── deployed_agents.py    # List live Agent Engine deployments + 3-chunk demo
+│   ├── test_deployment.py    # Test all APIs against live deployment
+│   └── cleanup_agents.py     # Delete old/broken deployments/agents
 ├── main.py               # CLI runner with built-in demo mode
+├── deploy.py             # Deploy to Vertex AI Agent Engine
 ├── setup.sh              # One-command bootstrap
 ├── requirements.txt
 ├── .env.example
@@ -94,25 +99,54 @@ Type `demo` in the CLI to run all 6 scenarios automatically.
 ## Architecture
 
 ```
-User message
-    │
-    ▼
-Guardrails AI (input_guardrail)     (out-of-scope topics + blocks injections)
-    │
-    ▼
-ADK Agent (GPT-4o-mini via OpenAI)        (decides which tool(s) to call)
-    │
-    ▼
-Tool layer (read-only)
-  ├── get_balance()
-  ├── get_transactions(days, filter, limit)
-  └── lookup_merchant(name)
-    │
-    ▼
-Guardrails AI (output_guardrail)     (redacts PII before response reaches user)
-    │
-    ▼
-Customer response
+┌─────────────────────────────────┐
+                │         Customer                 │
+                │   (Web / Mobile / CLI)           │
+                └────────────────┬────────────────┘
+                                 │
+                                 ▼
+                ┌─────────────────────────────────┐
+                │      Guardrails AI              │
+                │   input_guardrail               │
+                │  ├── Injection detection        │
+                │  ├── Out-of-scope blocking      │
+                │  └── Topic boundary enforcement │
+                └────────────────┬────────────────┘
+                                 │
+                                 ▼
+                ┌─────────────────────────────────┐
+                │       ADK Agent                 │
+                │   GPT-4o-mini (PoC)             │
+                │   gemini-2.0-flash (production) │
+                └────────────────┬────────────────┘
+                                 │
+                     ┌───────────┼───────────┐
+                     ▼           ▼           ▼
+              ┌──────────┐ ┌──────────- ┐   ┌──────────--┐
+              │get_      │ │get_        │   │  lookup_   │
+              │balance() │ │transactions|   │ merchant() | 
+              └──────────┘ └──────────--┘   └──────────--┘
+                                 │
+                                 ▼
+                ┌─────────────────────────────────┐
+                │   Synthetic Data (PoC)          │
+                │   Core Banking API (Q2)         │
+                └────────────────┬────────────────┘
+                                 │
+                                 ▼
+                ┌─────────────────────────────────┐
+                │      Guardrails AI              │
+                │   output_guardrail              │
+                │  ├── PII redaction              │
+                │  └── Response validation        │
+                └────────────────┬────────────────┘
+                                 │
+                                 ▼
+                ┌─────────────────────────────────┐
+                │         Customer                │
+                │         Response                │
+                └─────────────────────────────────┘
+
 ```
 
 Key design decisions:
