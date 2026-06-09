@@ -9,7 +9,7 @@ Designed as an PoC demonstrating: agentic tool use, safety guardrails, and evalu
 
 ```bash
 # 1. Clone
-git clone https://github.com/USERNAME/bank-chatbot.git
+git clone https://github.com/YasminFathy/bank-chatbot.git
 cd bank-chatbot
 
 # 2. Install + setup
