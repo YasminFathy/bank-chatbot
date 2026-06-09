@@ -100,7 +100,7 @@ User message
 Guardrails AI (input_guardrail)     (out-of-scope topics + blocks injections)
     │
     ▼
-ADK Agent (Gemini 2.0 Flash)        (decides which tool(s) to call)
+ADK Agent (GPT-4o-mini via OpenAI)        (decides which tool(s) to call)
     │
     ▼
 Tool layer (read-only)
@@ -272,7 +272,7 @@ Successfully deployed to **Vertex AI Agent Engine** (formerly known as Reasoning
 |---|---|
 | Project | `gen-lang-client-0019475937` |
 | Location | `europe-west2` |
-| Resource | `projects/297787477567/locations/europe-west2/reasoningEngines/6659398881811365888` |
+| Resource | `projects/297787477567/locations/europe-west2/reasoningEngines/7202082636909510656` |
 | Framework | Google ADK |
 | Runtime model | OpenAI GPT-4o-mini (OpenAI-compatible) |
 | Container memory | 4GB managed by GCP |
@@ -295,21 +295,52 @@ Google recently renamed **Reasoning Engine** to **Agent Engine**. The API path s
 
 ### List deployed agents
 
-Run `deployed_agents.py` to confirm the agent is live on GCP:
+Run `scripts/deployed_agents.py` to confirm the agent is live on GCP:
 
 ```bash
-python deployed_agents.py
+python scripts/deployed_agents.py
 ```
 
 Expected output:
 
 **Total deployed agents: 1**
 - **Name:**     bank-transaction-chatbot
-- **Resource:** projects/297787477567/locations/europe-west2/reasoningEngines/6659398881811365888
+- **Resource:** projects/297787477567/locations/europe-west2/reasoningEngines/7202082636909510656
 - **Created:**  2026-06-09 12:04:38.986989+00:00
 
 ### Test all APIs against the live deployment
 
 ```bash
-python test_deployment.py
+python scripts/test_deployment.py
 ```
+
+---
+
+## How the agent responds — 3 chunk streaming
+
+Every response from the deployed Agent Engine produces **3 streaming chunks**. This is agentic reasoning in action — the model doesn't just answer, it decides what tool to use, calls it, reads the result, then composes the answer.
+
+```bash
+python scripts/test_deployment.py
+```
+
+### Example: "What is my current balance?"
+
+| Chunk | Type | Content |
+|---|---|---|
+| 1 | `function_call` | Agent decides to call `get_balance()` |
+| 2 | `function_response` | Tool returns `{account: ****4821, available_gbp: 2847.63}` |
+| 3 | `text` | Agent responds "Your current balance is £2,847.63." |
+
+### Why this matters for a bank
+
+This gives full **observability into the agent's reasoning at runtime**:
+
+- Every tool call is logged and inspectable
+- You can see exactly what data the agent used to compose its answer
+- No hallucination possible — the agent can only quote data returned by tools
+- Full audit trail for every customer interaction — critical for FSA compliance
+
+### In the Agent Engine UI
+
+The same 3 chunks are visible as steps in the trace view:
