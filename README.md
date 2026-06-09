@@ -1,7 +1,9 @@
 # Bank Transaction Chatbot — PoC
 
+
 A customer-facing bank transaction chatbot built with **Google ADK** and **OpenAI GPT-4o-mini** (OpenAI-compatible provider).  
 Designed as PoC demonstrating: agentic tool use, safety guardrails, and evaluation tests.
+
 ---
 
 ## Quickstart
@@ -209,7 +211,7 @@ Missing either the env vars or the model change will break the switch. Both toge
 | Alternative | `ANTHROPIC_API_KEY=sk-ant-...` | `claude-haiku-3-5-20251001` |
 
 > In a real deployment both changes would be managed by the CI/CD pipeline; developers never touch production credentials directly.
- 
+
 > Secrets are stored in GCP Secret Manager and injected at runtime into Cloud Run.
 ----
 
