@@ -32,8 +32,8 @@ Rules:
 
 root_agent = Agent(
     name="bank_transaction_agent",
-    # model="openai/gpt-4o-mini", # PoC / OpenAI
-    model="openai/gemini-2.0-flash",  # production / Vertex AI
+    model="openai/gpt-4o-mini", # PoC / OpenAI
+    # model="gemini-2.0-flash",  # production / Vertex AI
     description="Helps bank customers check balances, browse transactions, and identify charges.",
     instruction=SYSTEM_PROMPT,
     tools=[get_balance, get_transactions, lookup_merchant],

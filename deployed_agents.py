@@ -23,3 +23,26 @@ for a in agents:
     print(f"Name:     {a.display_name}")
     print(f"Resource: {a.resource_name}")
     print(f"Created:  {a.create_time}")
+
+
+remote = agent_engines.get(
+    'projects/297787477567/locations/europe-west2/reasoningEngines/7202082636909510656'
+)
+
+print(f"Agent found: {remote.display_name}")
+
+# Create session and print it
+session = remote.create_session(user_id='demo')
+print(f"Session created: {session}")
+print("---")
+
+# Count chunks
+chunks = list(remote.stream_query(
+    user_id='demo',
+    session_id=session['id'],
+    message='What is my current balance?'
+))
+
+print(f"Total chunks received: {len(chunks)}")
+for i, chunk in enumerate(chunks):
+    print(f"Chunk {i}: {chunk}")

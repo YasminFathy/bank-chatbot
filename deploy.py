@@ -28,11 +28,12 @@ vertexai.init(project=PROJECT_ID, location=LOCATION, staging_bucket=BUCKET)
 remote = agent_engines.create(
     agent_engines.AdkApp(agent=agent),
     requirements=[
-        "google-adk>=1.0.0",
+        "google-adk[extensions]>=1.0.0",
         "google-cloud-aiplatform[agent_engines,reasoningengine]>=1.71.0",
         "openai>=1.30.0",
         "python-dotenv>=1.0.0",
         "cloudpickle>=3.1.2",
+        "litellm>=1.75.5",
         "pydantic>=2.12.5",
     ],
     extra_packages=[
