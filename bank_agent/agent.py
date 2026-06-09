@@ -3,6 +3,12 @@ from google.adk.agents import Agent
 from bank_agent.tools import get_balance, get_transactions, lookup_merchant
 from bank_agent.guardrails import input_guardrail, output_guardrail
 
+SYSTEM_PROMPT = """Bank assistant for CUST-001 (demo).
+Help with: balance, transactions, charge identification only.
+Never discuss loans, investments, payments or give financial advice.
+Only use data from tools. Be brief."""
+
+'''
 SYSTEM_PROMPT = """You are a helpful bank account assistant for demo bank customers.
 
 You can ONLY help with:
@@ -22,10 +28,11 @@ Rules:
 - For anything out of scope, politely redirect: "For [topic], please call 0300 XXX XXXX or visit a branch."
 - The authenticated customer for this session is CUST-001 (demo mode).
 """
+'''
 
 root_agent = Agent(
     name="bank_transaction_agent",
-    model="gemini-2.0-flash",
+    model="openai/gpt-4o-mini",
     description="Helps bank customers check balances, browse transactions, and identify charges.",
     instruction=SYSTEM_PROMPT,
     tools=[get_balance, get_transactions, lookup_merchant],

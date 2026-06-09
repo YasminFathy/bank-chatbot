@@ -19,7 +19,9 @@ def get_balance() -> dict:
     }
 
 
-def get_transactions(days: int = 30, merchant_filter: str = "", limit: int = 10) -> dict:
+def get_transactions(
+    days: int = 30, merchant_filter: str = "", limit: int = 10
+) -> dict:
     """Get recent transactions for the authenticated customer.
 
     Args:
@@ -32,7 +34,8 @@ def get_transactions(days: int = 30, merchant_filter: str = "", limit: int = 10)
     cutoff = datetime.now() - timedelta(days=days)
 
     txns = [
-        t for t in TRANSACTIONS.get(CUSTOMER_ID, [])
+        t
+        for t in TRANSACTIONS.get(CUSTOMER_ID, [])
         if datetime.fromisoformat(t["date"]) >= cutoff
     ]
     if merchant_filter:

@@ -5,6 +5,7 @@ Some lightweight regex validators for the PoC.
 Production equivalents are noted inline — all are drop-in replacements
 using the same ADK callback signatures.
 """
+
 import re
 
 from google.adk.agents.callback_context import CallbackContext
@@ -30,7 +31,7 @@ _OUT_OF_SCOPE = re.compile(
 
 # Production: replace with Guardrails AI detect-pii NeMo validator
 _PII_REDACTIONS = [
-    (re.compile(r"\b\d{8}\b"), "[ACCOUNT]"),           # 8-digit account numbers
+    (re.compile(r"\b\d{8}\b"), "[ACCOUNT]"),  # 8-digit account numbers
     (re.compile(r"\b\d{2}-\d{2}-\d{2}\b"), "[SORT_CODE]"),  # UK sort codes
     (re.compile(r"\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b"), "[CARD]"),  # Card numbers
 ]
@@ -45,50 +46,26 @@ _SAFE_REDIRECT = (
 # ADK Callbacks
 # --------------------
 
-def input_guardrail(
-    tool: BaseTool,
-    tool_input: dict,
-    tool_context: CallbackContext,
-) -> dict | None:
-    """
-    Runs BEFORE every tool call.
-    Returns a dict to short-circuit the tool (used as the result).
-    Returns None to let the tool run normally.
-    """
-    user_message = tool_context.state.get("last_user_message", "")
 
+def input_guardrail(**kwargs):
+    tool_context = kwargs.get("tool_context")
+    msg = ""
+    if tool_context:
+        msg = tool_context.state.get("last_user_message", "")
     for pattern in _INJECTION_PATTERNS:
-        if pattern.search(user_message):
-            return {
-                "guardrail_blocked": True,
-                "reason": "prompt_injection",
-                "message": _SAFE_REDIRECT,
-            }
-
-    if _OUT_OF_SCOPE.search(user_message):
-        return {
-            "guardrail_blocked": True,
-            "reason": "out_of_scope",
-            "message": _SAFE_REDIRECT,
-        }
-
-    return None  # all clear
+        if pattern.search(msg):
+            return {"blocked": True, "message": _SAFE_REDIRECT}
+    if _OUT_OF_SCOPE.search(msg):
+        return {"blocked": True, "message": _SAFE_REDIRECT}
+    return None
 
 
-def output_guardrail(
-    callback_context: CallbackContext,
-    llm_response: LlmResponse,
-) -> LlmResponse | None:
-    """
-    Runs AFTER every agent response.
-    Redacts PII from outbound text. Returns None to pass through unchanged.
-    """
-    if not llm_response.content or not llm_response.content.parts:
+def output_guardrail(**kwargs):
+    llm_response = kwargs.get("llm_response")
+    if not llm_response or not llm_response.content or not llm_response.content.parts:
         return None
-
-    new_parts = []
     modified = False
-
+    new_parts = []
     for part in llm_response.content.parts:
         if part.text:
             cleaned = part.text
@@ -100,12 +77,8 @@ def output_guardrail(
             new_parts.append(type(part)(text=cleaned))
         else:
             new_parts.append(part)
-
     if modified:
-        new_content = type(llm_response.content)(
-            parts=new_parts,
-            role=llm_response.content.role,
-        )
+        new_content = type(llm_response.content)(parts=new_parts, role=llm_response.content.role)
+        from google.adk.models.llm_response import LlmResponse
         return LlmResponse(content=new_content)
-
     return None

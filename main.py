@@ -2,6 +2,7 @@
 CLI runner for the bank transaction chatbot PoC.
 For the web UI demo run:  adk web --host 0.0.0.0 --port 8080
 """
+
 import asyncio
 import os
 
@@ -26,23 +27,25 @@ console = Console()
 
 async def main() -> None:
     console.print()
-    console.print(Panel.fit(
-        Text.assemble(
-            ("Bank Transaction Chatbot", "bold blue"),
-            "  ",
-            ("ADK PoC | Gemini 2.0 Flash", "dim"),
-            "\n",
-            ("─" * 40, "dim"),
-            "\n",
-            ("Commands: ", "dim"),
-            ("exit", "bold"),
-            ("  |  ", "dim"),
-            ("demo", "bold"),
-            (" (runs full demo script)", "dim"),
-        ),
-        border_style="blue",
-        padding=(0, 1),
-    ))
+    console.print(
+        Panel.fit(
+            Text.assemble(
+                ("Bank Transaction Chatbot", "bold blue"),
+                "  ",
+                ("ADK PoC | Gemini 2.0 Flash", "dim"),
+                "\n",
+                ("─" * 40, "dim"),
+                "\n",
+                ("Commands: ", "dim"),
+                ("exit", "bold"),
+                ("  |  ", "dim"),
+                ("demo", "bold"),
+                (" (runs full demo script)", "dim"),
+            ),
+            border_style="blue",
+            padding=(0, 1),
+        )
+    )
     console.print()
 
     session_service = InMemorySessionService()
@@ -99,24 +102,28 @@ async def main() -> None:
                 console.print(f"[bold green]You:[/bold green] {q}")
                 with console.status("[dim]Thinking...[/dim]", spinner="dots"):
                     response = await ask(q)
-                console.print(Panel(
-                    response or "[dim]No response[/dim]",
-                    title="[bold blue]Assistant[/bold blue]",
-                    border_style="blue",
-                    padding=(0, 1),
-                ))
+                console.print(
+                    Panel(
+                        response or "[dim]No response[/dim]",
+                        title="[bold blue]Assistant[/bold blue]",
+                        border_style="blue",
+                        padding=(0, 1),
+                    )
+                )
                 console.print()
             continue
 
         with console.status("[dim]Thinking...[/dim]", spinner="dots"):
             response = await ask(user_input)
 
-        console.print(Panel(
-            response or "[dim]No response[/dim]",
-            title="[bold blue]Assistant[/bold blue]",
-            border_style="blue",
-            padding=(0, 1),
-        ))
+        console.print(
+            Panel(
+                response or "[dim]No response[/dim]",
+                title="[bold blue]Assistant[/bold blue]",
+                border_style="blue",
+                padding=(0, 1),
+            )
+        )
         console.print()
 
 
