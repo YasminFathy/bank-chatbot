@@ -7,9 +7,9 @@ using the same ADK callback signatures.
 """
 import re
 
-from google.adk.agents import CallbackContext
-from google.adk.tools import BaseTool
-from google.adk.models import LlmResponse
+from google.adk.agents.callback_context import CallbackContext
+from google.adk.tools.base_tool import BaseTool
+from google.adk.models.llm_response import LlmResponse
 
 # --------------------
 # Patterns
