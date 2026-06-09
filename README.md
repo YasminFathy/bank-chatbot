@@ -213,6 +213,21 @@ Missing either the env vars or the model change will break the switch. Both toge
 > In a real deployment both changes would be managed by the CI/CD pipeline; developers never touch production credentials directly.
 
 > Secrets are stored in GCP Secret Manager and injected at runtime into Cloud Run.
+---
+
+## Important — env vars and model string must always match
+
+ADK uses whichever auth method is active in the environment. If `GOOGLE_GENAI_USE_VERTEXAI=TRUE` is set, ADK ignores `OPENAI_API_KEY` entirely and tries to use Vertex AI auth — even if the model string says `openai/`. So both must change together.
+
+| `.env` state | `agent.py` model | Result |
+|---|---|---|
+| `OPENAI_API_KEY` set, Vertex lines commented out | `openai/gpt-4o-mini` |  CLI works |
+| `OPENAI_API_KEY` set, Vertex lines commented out | `gemini-2.0-flash` |  Fails — model mismatch |
+| Vertex lines uncommented, no OpenAI key | `gemini-2.0-flash` | Deploys to Vertex AI |
+| Both sets active | anything | Vertex AI takes priority |
+
+**Rule:** comment out one set, uncomment the other — never have both active at the same time.
+
 ----
 
 ## Deploying to Vertex AI Agent Engine (production)
