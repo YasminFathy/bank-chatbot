@@ -1,3 +1,15 @@
+"""
+deploy.py
+Deploys the bank transaction chatbot to Vertex AI Agent Engine.
+
+Before running this script, follow the production switching steps in README.md:
+  - Set GOOGLE_GENAI_USE_VERTEXAI=TRUE in .env
+  - Set GOOGLE_CLOUD_PROJECT in .env
+  - Set GOOGLE_CLOUD_LOCATION in .env
+  - Update model="gemini-2.0-flash" in bank_agent/agent.py
+
+See: README.md — "Switching to production (Vertex AI)" section
+"""
 import os
 import vertexai
 from vertexai import agent_engines
