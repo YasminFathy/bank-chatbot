@@ -1,3 +1,9 @@
+"""
+deployed_agents.py
+Lists all deployed Vertex AI Agent Engine instances for this project.
+Run with: python deployed_agents.py
+"""
+
 import vertexai
 from vertexai import agent_engines
 from dotenv import load_dotenv

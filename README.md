@@ -253,10 +253,63 @@ print(f"Deployed: {remote.resource_name}")
 
 | Simplified in PoC | Production equivalent |
 |---|---|
-| `InMemorySessionService` | `VertexAiSessionService` (one import swap) |
+| `InMemorySessionService` | `VertexAiSessionService` (import swap) |
 | Regex PII redaction | Guardrails AI `detect-pii` NeMo validator |
 | Synthetic transaction data | Core banking stub → live read-only API |
 | AI Studio API key | Vertex AI with VPC Service Controls + Cloud IAP |
 | CLI / ADK web UI | Bank's React chat widget |
 | No rate limiting | Apigee + Cloud Armor WAF |
 | Print logging | Cloud Logging structured JSON + BigQuery audit export |
+
+
+---
+
+## Live deployment — Vertex AI Agent Engine
+
+Successfully deployed to **Vertex AI Agent Engine** (formerly known as Reasoning Engine) in `europe-west2` — all data stays within UK/EU region.
+
+| Detail | Value |
+|---|---|
+| Project | `gen-lang-client-0019475937` |
+| Location | `europe-west2` |
+| Resource | `projects/297787477567/locations/europe-west2/reasoningEngines/6659398881811365888` |
+| Framework | Google ADK |
+| Runtime model | OpenAI GPT-4o-mini (OpenAI-compatible) |
+| Container memory | 4GB managed by GCP |
+
+### What the deployment proves
+
+- Agent runs as a **managed, auto-scaling container on GCP** — no Dockerfile or Kubernetes needed
+- Full **tool call traces** visible in Agent Engine UI — every `get_balance()`, `get_transactions()`, `lookup_merchant()` call is logged and inspectable
+- **Data residency** enforced in `europe-west2` — meets UK/EU financial regulation requirements
+- **One command deploy** — `python deploy.py` handles packaging, uploading, and starting the container
+
+### Naming note
+
+Google recently renamed **Reasoning Engine** to **Agent Engine**. The API path still shows `reasoningEngines` but the product is now called Agent Engine. Both names refer to the same service.
+
+
+---
+
+## Live deployment
+
+### List deployed agents
+
+Run `deployed_agents.py` to confirm the agent is live on GCP:
+
+```bash
+python deployed_agents.py
+```
+
+Expected output:
+
+**Total deployed agents: 1**
+- **Name:**     bank-transaction-chatbot
+- **Resource:** projects/297787477567/locations/europe-west2/reasoningEngines/6659398881811365888
+- **Created:**  2026-06-09 12:04:38.986989+00:00
+
+### Test all APIs against the live deployment
+
+```bash
+python test_deployment.py
+```
