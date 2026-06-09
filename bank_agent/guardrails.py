@@ -78,7 +78,10 @@ def output_guardrail(**kwargs):
         else:
             new_parts.append(part)
     if modified:
-        new_content = type(llm_response.content)(parts=new_parts, role=llm_response.content.role)
+        new_content = type(llm_response.content)(
+            parts=new_parts, role=llm_response.content.role
+        )
         from google.adk.models.llm_response import LlmResponse
+
         return LlmResponse(content=new_content)
     return None
